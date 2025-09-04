@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../api/test_api.dart';
 import '../../models/test_model.dart';
 import 'add_edit_question_screen.dart';
@@ -74,11 +76,51 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
     }
   }
 
+  // 🔹 Shimmer loader widget
+  Widget _buildShimmerLoader() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Fake Test Info Box
+        Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            width: double.infinity,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Fake Question Cards
+        ...List.generate(3, (index) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            child: Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 16),
+              height: 140,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Test Details'),
+          title: const Text('Test details'),
           centerTitle: true,
           backgroundColor: Colors.indigo,
           foregroundColor: Colors.white,
@@ -88,7 +130,7 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
           future: _testFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return _buildShimmerLoader(); // ✅ shimmer instead of spinner
             }
             if (snapshot.hasError) {
               return Center(
@@ -270,9 +312,8 @@ class _TestDetailScreenState extends State<TestDetailScreen> {
               color: Colors.white,
             ),
           ),
-          backgroundColor:
-              Colors.indigo.withOpacity(0.8), // semi-transparent bg
-          elevation: 8, // adds subtle blur-like shadow
+          backgroundColor: Colors.indigo.withOpacity(0.8),
+          elevation: 8,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

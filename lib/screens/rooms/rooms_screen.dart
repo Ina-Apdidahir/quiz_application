@@ -1,8 +1,5 @@
-// =========================================================================
-// screens/rooms/rooms_screen.dart
-// Path: lib/screens/rooms/rooms_screen.dart (Redesigned UI)
-
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../api/room_api.dart';
 import '../../models/room_model.dart';
 import 'add_edit_room_screen.dart';
@@ -113,7 +110,12 @@ class _RoomsScreenState extends State<RoomsScreen> {
           future: _roomsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              // ✅ Show shimmer skeletons instead of spinner
+              return ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: 5,
+                itemBuilder: (context, index) => const _RoomSkeleton(),
+              );
             }
             if (snapshot.hasError) {
               return _buildEmptyState(
@@ -178,24 +180,23 @@ class _RoomsScreenState extends State<RoomsScreen> {
           },
         ),
       ),
-       floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _navigateAndRefresh(const AddEditRoomScreen()),
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text(
-            "ROOM",
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 14,
-              color: Colors.white,
-            ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _navigateAndRefresh(const AddEditRoomScreen()),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text(
+          "ROOM",
+          style: TextStyle(
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+            color: Colors.white,
           ),
-          backgroundColor:
-              Colors.indigo.withOpacity(0.8), // semi-transparent bg
-          elevation: 8, // adds subtle blur-like shadow
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        )
+        ),
+        backgroundColor: Colors.indigo.withOpacity(0.8),
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 
@@ -215,6 +216,44 @@ class _RoomsScreenState extends State<RoomsScreen> {
               style: TextStyle(color: color, fontSize: 16),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoomSkeleton extends StatelessWidget {
+  const _RoomSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(16),
+          leading: Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+            ),
+          ),
+          title: Container(
+            height: 16,
+            width: double.infinity,
+            color: Colors.white,
+            margin: const EdgeInsets.only(bottom: 8),
+          ),
+          subtitle: Container(
+            height: 14,
+            width: 100,
+            color: Colors.white,
+          ),
         ),
       ),
     );

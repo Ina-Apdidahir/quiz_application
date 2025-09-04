@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../api/test_api.dart';
 import '../../student/screens/test_detail_screen.dart';
 
@@ -46,28 +48,30 @@ class _RoomTestsScreenState extends State<RoomTestsScreen> {
         title: const Text(
           "Room Tests",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+              fontWeight: FontWeight.bold, color: Colors.black87),
         ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: 5,
+              itemBuilder: (context, index) =>
+                  const _TestSkeletonCard(),
+            )
           : tests.isEmpty
               ? const Center(
-                  child: Text(
-                    "No tests available",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  child: Text("No tests available",
+                      style: TextStyle(fontSize: 16, color: Colors.grey)),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.all(12),
                   itemCount: tests.length,
                   itemBuilder: (context, index) {
                     final test = tests[index];
-                    final createdBy = test['createdBy']?['name'] ?? 'Unknown';
+                    final createdBy =
+                        test['createdBy']?['name'] ?? 'Unknown';
                     final createdAt = test['createdAt'] != null
                         ? DateFormat.yMMMd()
                             .add_jm()
@@ -113,31 +117,23 @@ class _RoomTestsScreenState extends State<RoomTestsScreen> {
                             const SizedBox(width: 16),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    test['testTitle'] ?? 'Untitled Test',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
+                                  Text(test['testTitle'] ?? 'Untitled Test',
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87)),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    "Created by: $createdBy",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey.shade700,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Date: $createdAt",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600,
-                                    ),
-                                  ),
+                                  Text("Created by: $createdBy",
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey.shade700)),
+                                  Text("Date: $createdAt",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade600)),
                                 ],
                               ),
                             ),
@@ -149,6 +145,28 @@ class _RoomTestsScreenState extends State<RoomTestsScreen> {
                     );
                   },
                 ),
+    );
+  }
+}
+
+/// 🔹 Skeleton Loader for RoomTestsScreen
+class _TestSkeletonCard extends StatelessWidget {
+  const _TestSkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
+        height: 90,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
     );
   }
 }
